@@ -6,8 +6,14 @@ using Toybox.System;
 module SimpleSensor {
 	module StairMeter {
 		function renderStairMeter(dc, SCREEN_SIZE) {
-	        var floorsClimbed = GoalTracker.getFloorsClimbed() + 1; // Ensure we always display at least one item
-	        var floorsClimbedGoal = GoalTracker.getFloorsClimbedGoal() + 1;
+	        var floorsClimbed = GoalTracker.getFloorsClimbed(); // Ensure we always display at least one item
+	        var floorsClimbedGoal = GoalTracker.getFloorsClimbedGoal();
+			if (floorsClimbed == null || floorsClimbedGoal == null) {
+				return;
+			}
+	
+			++floorsClimbed;
+			++floorsClimbedGoal;
 	
 			var x_c = SCREEN_SIZE / 2;
 			var y_c = SCREEN_SIZE / 2;

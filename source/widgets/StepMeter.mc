@@ -43,6 +43,9 @@ module SimpleSensor {
 		function renderStepMeter(dc) {
 	        var steps = GoalTracker.getSteps();
 	        var stepsGoal = GoalTracker.getStepsGoal();
+	        if (null == steps || stepsGoal == null) {
+	        	return;
+	        }
 	
 			renderStepText(dc, steps, stepsGoal);
 			renderCheckerboard(dc, steps, stepsGoal);	
