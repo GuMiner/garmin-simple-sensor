@@ -13,11 +13,36 @@ using SimpleSensor.StepMeter;
 
 // Renders the watch
 class SimpleSensorView extends WatchUi.WatchFace {
+    // Per-device font settings used to ensure fonts aren't cutoff and render properly.
+    var bottomMildFontCutoff;
+    var mildFontAscent;
+    var topMildFontCutoff;
+    const FONT_CLIP_WIGGLE = 4;
+    
+    var tinyFontHeight;
+    var hugeFontDescent;
+    var stepDivisor;
+    
     function initialize() {
         WatchFace.initialize();
+        
+        bottomMildFontCutoff = Graphics.getFontDescent(Graphics.FONT_NUMBER_MILD);
+        mildFontAscent = Graphics.getFontAscent(Graphics.FONT_NUMBER_MILD);
+        topMildFontCutoff = Graphics.getFontHeight(Graphics.FONT_NUMBER_MILD) - mildFontAscent;
+        
+        tinyFontHeight = Graphics.getFontHeight(Graphics.FONT_TINY);         
+        hugeFontDescent = Graphics.getFontDescent(Graphics.FONT_NUMBER_THAI_HOT);
+        
+        // This hack detects if we are on devices with larger fonts, in which case we need to squish the extra sensors so they all fit in the display.
+        stepDivisor = 1;
+        if (hugeFontDescent == 0)
+        {
+        	stepDivisor = 4;
+        }
     }   
     
     const SCREEN_SIZE = 240;
+	const DAY_MONTH_Y = 55;
 	
 	var lastHr = 70; // A reasonable default for first-time startup
 	var fullUpdate = false;
@@ -32,11 +57,11 @@ class SimpleSensorView extends WatchUi.WatchFace {
 		// Render time info    	
         var clockTime = System.getClockTime();
         renderHrMin(dc, clockTime.hour, clockTime.min);
-        DayMonth.renderDayMonth(dc);
+        DayMonth.renderDayMonth(dc, SCREEN_SIZE, DAY_MONTH_Y);
         
         // Render all the various sensors
 		BatteryMeter.renderBatteryPercent(dc, SCREEN_SIZE);
-		MinorSensors.render(dc);
+		MinorSensors.render(dc, stepDivisor);
 		StairMeter.renderStairMeter(dc, SCREEN_SIZE);
 		StepMeter.renderStepMeter(dc);
 
@@ -49,9 +74,7 @@ class SimpleSensorView extends WatchUi.WatchFace {
     }
     
 	const SEC_Y = SCREEN_SIZE / 2 - 15;
-	const HR_X = SCREEN_SIZE / 2;
-	const HR_Y = SCREEN_SIZE / 2 - 125;
-    
+
     var hrMinXRight = 0;
     function renderHrMin(dc, hours, minutes) {
         // Account for 12 / 24 hour time
@@ -65,12 +88,12 @@ class SimpleSensorView extends WatchUi.WatchFace {
 		var fontSize = Graphics.FONT_NUMBER_THAI_HOT;
 		var dim = dc.getTextDimensions(timeString, fontSize);
 		var x = SCREEN_SIZE / 2 - 20;
-		var y = SCREEN_SIZE / 2 - 55;
+		var y = DAY_MONTH_Y + tinyFontHeight - hugeFontDescent;
         dc.setColor(0xFFFF0F, Graphics.COLOR_BLACK); // Effectively yellow
         dc.drawText(x, y, fontSize, timeString, Graphics.TEXT_JUSTIFY_CENTER);
 
 		// Used to properly position the seconds         
-		hrMinXRight = x + dim[0] / 2;	
+		hrMinXRight = x + dim[0] / 2;
     }
     
     function renderCalories(dc) {
@@ -81,7 +104,7 @@ class SimpleSensorView extends WatchUi.WatchFace {
     	
     	var str = cal.format("%d");    
 	    dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_BLACK);
-    	dc.drawText(HR_X, HR_Y + 30, Graphics.FONT_XTINY, str, Graphics.TEXT_JUSTIFY_CENTER);
+    	dc.drawText(SCREEN_SIZE / 2, mildFontAscent - topMildFontCutoff, Graphics.FONT_XTINY, str, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
 	function onPartialUpdate(dc) {
@@ -90,8 +113,6 @@ class SimpleSensorView extends WatchUi.WatchFace {
 	}
 
 	// Minimize the y-clipping area to reduce power consumption and squeeze text in real close.
-	const Y_CLIP_OFFSET = 5;
-
 	var lastSecondsWidth = 0;
 	function updateSeconds(dc) {
 		var secString = System.getClockTime().sec.format("%d");
@@ -104,12 +125,12 @@ class SimpleSensorView extends WatchUi.WatchFace {
 		// Used to ensure we don't leave junk pixels behind
 		if (dim[0] < lastSecondsWidth)
 		{
-			dc.setClip(x, y, lastSecondsWidth, dim[1] - Y_CLIP_OFFSET);
+			dc.setClip(x, y, lastSecondsWidth, dim[1] - bottomMildFontCutoff + FONT_CLIP_WIGGLE);
 	        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_WHITE);
-	        dc.fillRectangle(x, y, lastSecondsWidth, dim[1] - Y_CLIP_OFFSET);
+	        dc.fillRectangle(x, y, lastSecondsWidth, dim[1] - bottomMildFontCutoff + FONT_CLIP_WIGGLE);
 		}
 
-		dc.setClip(x, y, dim[0], dim[1] - Y_CLIP_OFFSET);
+		dc.setClip(x, y, dim[0], dim[1] - bottomMildFontCutoff + FONT_CLIP_WIGGLE);
 		dc.setColor(0xFFFF66, Graphics.COLOR_BLACK);		
 		dc.drawText(x, y, fontSize, secString, Graphics.TEXT_JUSTIFY_LEFT);
 
@@ -140,19 +161,19 @@ class SimpleSensorView extends WatchUi.WatchFace {
 			var fontSize = Graphics.FONT_NUMBER_MILD;
 			var dim = dc.getTextDimensions(hrString, fontSize);
 		
-			var x = HR_X;
-			var y = HR_Y;
+			var x = SCREEN_SIZE / 2;
+			var y = -topMildFontCutoff;
 			
 			// Ensure if we fluctuate around 100 BPM, we don't leave junk data behind when the number
 			//  being rendered is smaller than the previous number
 			if (dim[0] < lastHrWidth)
 			{	
-				dc.setClip(x - lastHrWidth / 2, y, lastHrWidth, dim[1] - Y_CLIP_OFFSET);
+				dc.setClip(x - lastHrWidth / 2, y, lastHrWidth, dim[1] - bottomMildFontCutoff + FONT_CLIP_WIGGLE);
 	        	dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_WHITE);
-	        	dc.fillRectangle(x - lastHrWidth / 2, y, lastHrWidth, dim[1] - Y_CLIP_OFFSET);
+	        	dc.fillRectangle(x - lastHrWidth / 2, y, lastHrWidth, dim[1] - bottomMildFontCutoff + FONT_CLIP_WIGGLE);
 			}
 			
-			dc.setClip(x - dim[0] / 2, y, dim[0], dim[1] - Y_CLIP_OFFSET);
+			dc.setClip(x - dim[0] / 2, y, dim[0], dim[1] - bottomMildFontCutoff + FONT_CLIP_WIGGLE);
 			
 			dc.setColor(hrColor, Graphics.COLOR_BLACK);
 			dc.drawText(x, y, fontSize, hrString, Graphics.TEXT_JUSTIFY_CENTER);

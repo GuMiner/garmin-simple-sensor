@@ -6,11 +6,9 @@ using Toybox.Time;
 // Renders the day / month view
 module SimpleSensor {
 	module DayMonth {
-		const DAY_MONTH_X = 60;
-		const DAY_MONTH_Y = 55;
 		const DAY_MONTH_SPACE = 5;
 	
-	    function renderDayMonth(dc) {
+	    function renderDayMonth(dc, SCREEN_SIZE, yStart) {
 	    	var now = Time.now();
 	        var mediumTimeFormat = Time.Gregorian.info(now, Time.FORMAT_MEDIUM);
 	    	
@@ -21,11 +19,15 @@ module SimpleSensor {
 			var fontSize = Graphics.FONT_SYSTEM_TINY;
 			var dayStrLen =	dc.getTextWidthInPixels(dayStr, fontSize);
 			var dayNumberStrLen = dc.getTextWidthInPixels(dayNumberStr, fontSize);
+			var monthStrLen = dc.getTextWidthInPixels(monthStr, fontSize);
+			
+			// Center the font in the view
+			var xStart = (SCREEN_SIZE - (dayStrLen + dayNumberStrLen + monthStrLen + 2 * DAY_MONTH_SPACE)) / 2;
 			
 			dc.setColor(0x888888, Graphics.COLOR_BLACK);
-			dc.drawText(DAY_MONTH_X, DAY_MONTH_Y, fontSize, dayStr, Graphics.TEXT_JUSTIFY_LEFT);
-			dc.drawText(DAY_MONTH_X + dayStrLen + DAY_MONTH_SPACE, DAY_MONTH_Y, fontSize, dayNumberStr, Graphics.TEXT_JUSTIFY_LEFT);
-			dc.drawText(DAY_MONTH_X + dayStrLen + dayNumberStrLen + DAY_MONTH_SPACE * 2, DAY_MONTH_Y, fontSize, monthStr, Graphics.TEXT_JUSTIFY_LEFT);
+			dc.drawText(xStart, yStart, fontSize, dayStr, Graphics.TEXT_JUSTIFY_LEFT);
+			dc.drawText(xStart + dayStrLen + DAY_MONTH_SPACE, yStart, fontSize, dayNumberStr, Graphics.TEXT_JUSTIFY_LEFT);
+			dc.drawText(xStart + dayStrLen + dayNumberStrLen + DAY_MONTH_SPACE * 2, yStart, fontSize, monthStr, Graphics.TEXT_JUSTIFY_LEFT);
 	    }
     }
 }

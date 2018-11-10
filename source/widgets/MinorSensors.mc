@@ -10,21 +10,21 @@ module SimpleSensor {
 		const X_SEP = 20;
 		
 		var currentX;
-		function render(dc) {
+		function render(dc, stepDivisor) {
 			currentX = TEMP_X;
 			dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLACK);
 			
-			renderTemperature(dc);
-			renderElevation(dc);
-			renderPressure(dc);
+			renderTemperature(dc, stepDivisor);
+			renderElevation(dc, stepDivisor);
+			renderPressure(dc, stepDivisor);
 		}
 		
-		function renderString(dc, str) {
+		function renderString(dc, str, stepDivisor) {
 			dc.drawText(currentX, Y_POS, Graphics.FONT_XTINY, str, Graphics.TEXT_JUSTIFY_LEFT);
-			currentX = currentX + X_SEP + dc.getTextWidthInPixels(str, Graphics.FONT_XTINY);
+			currentX = currentX + X_SEP / stepDivisor + dc.getTextWidthInPixels(str, Graphics.FONT_XTINY);
 		}
 	
-		function renderTemperature(dc) {
+		function renderTemperature(dc, stepDivisor) {
 			var temp = Sensors.getLastTemperature();
 			if (null == temp) {
 				return;
@@ -39,10 +39,10 @@ module SimpleSensor {
 				tempStr = Lang.format("$1$ C", [temp.format("%.1f")]);
 			}
 			
-			renderString(dc, tempStr);
+			renderString(dc, tempStr, stepDivisor);
     	}
     
-    	function renderElevation(dc) {
+    	function renderElevation(dc, stepDivisor) {
 			var elevation = Sensors.getLastElevation();
 			if (null == elevation) {
 				return;
@@ -57,10 +57,10 @@ module SimpleSensor {
 				elevationStr = Lang.format("$1$ m", [elevation.format("%.0f")]);
 			}
 			
-			renderString(dc, elevationStr);
+			renderString(dc, elevationStr, stepDivisor);
     	}
     
-	    function renderPressure(dc) {
+	    function renderPressure(dc, stepDivisor) {
 	    	// Pressure normally is plus or minus 4% of 1 ATM (101,325 Pa), so we render it as a percentage difference from 1 ATM
 	    	var pressure = Sensors.getLastPressure();
 			if (null == pressure || pressure == 0) {
@@ -70,7 +70,7 @@ module SimpleSensor {
 			var pressureDelta = 100.0 * 101325 / pressure - 100.0;
 			var pressureStr = Lang.format("$1$ %", [pressureDelta.format("%+.1f")]);
 			
-			renderString(dc, pressureStr);
+			renderString(dc, pressureStr, stepDivisor);
 	    }
 	}
 }
