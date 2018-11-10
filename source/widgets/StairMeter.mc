@@ -11,9 +11,12 @@ module SimpleSensor {
 			if (floorsClimbed == null || floorsClimbedGoal == null) {
 				return;
 			}
-	
-			++floorsClimbed;
-			++floorsClimbedGoal;
+			
+	    	var floorsToRender = Math.ceil(floorsClimbed * 10 / floorsClimbedGoal) + 1;
+			if (floorsToRender > 11)
+			{
+				floorsToRender = 11;
+			}
 	
 			var x_c = SCREEN_SIZE / 2;
 			var y_c = SCREEN_SIZE / 2;
@@ -26,7 +29,7 @@ module SimpleSensor {
 			var spacerHalf = spacerEnd / 2;
 			
 			dc.setColor(Graphics.COLOR_DK_BLUE, Graphics.COLOR_BLACK);
-			for (var i = 0; i < floorsClimbedGoal; i++)
+			for (var i = 0; i < 11; i++)
 			{
 				var x_o = x_c + rad_out * Math.cos(a_c - i * spacerAngle);
 				var y_o = y_c + rad_out * Math.sin(a_c - i * spacerAngle);
@@ -44,7 +47,7 @@ module SimpleSensor {
 				{
 					dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_BLACK);
 				}
-				else if (i == floorsClimbed) 
+				else if (i == floorsToRender) 
 				{
 					dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
 				}
