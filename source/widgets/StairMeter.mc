@@ -19,7 +19,7 @@ module SimpleSensor {
 			var spacerEnd = 6.0 * Math.PI / 180.0;
 			var spacerHalf = spacerEnd / 2;
 			
-			dc.setColor(0x88FF88, Graphics.COLOR_BLACK);
+			dc.setColor(Graphics.COLOR_DK_BLUE, Graphics.COLOR_BLACK);
 			for (var i = 0; i < floorsClimbedGoal; i++)
 			{
 				var x_o = x_c + rad_out * Math.cos(a_c - i * spacerAngle);
@@ -36,11 +36,11 @@ module SimpleSensor {
 	
 				if (i == 1)
 				{
-					dc.setColor(0x33FF33, Graphics.COLOR_BLACK);
+					dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_BLACK);
 				}
 				else if (i == floorsClimbed) 
 				{
-					dc.setColor(0x303030, Graphics.COLOR_BLACK);
+					dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
 				}
 				
 				dc.fillPolygon([[x_o, y_o], [x_1, y_1], [x_2, y_2], [x_3, y_3]]);			
