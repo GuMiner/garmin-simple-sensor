@@ -7,25 +7,50 @@ module SimpleSensor {
 	module GoalTracker {
 		// Returns the aclories burned (kCal) in the current day
 		function getCalories() {
-			return ActivityMonitor.getInfo().calories;
+			var info = ActivityMonitor.getInfo();
+			if (!(info has :calories)) {
+				return null;
+			} 
+			
+			return info.calories;
 		} 
 	
 		// Returns the number of floors climbed (integer)
 		function getFloorsClimbed() {
-			return ActivityMonitor.getInfo().floorsClimbed;
+			var info = ActivityMonitor.getInfo();
+			if (!(info has :floorsClimbed)) {
+				return null;
+			}
+			
+			return info.floorsClimbed;
 		}
 		
 		function getFloorsClimbedGoal() {
-			return ActivityMonitor.getInfo().floorsClimbedGoal;
+			var info = ActivityMonitor.getInfo();
+			if (!(info has :floorsClimbedGoal)) {
+				return null;
+			}
+			
+			return info.floorsClimbedGoal;
 		}
 		
 		// Returns the number of steps clibmed (integer)
 		function getSteps() {
-			return ActivityMonitor.getInfo().steps;
+			var info = ActivityMonitor.getInfo();
+			if (!(info has :steps)) {
+				return null;
+			}
+			
+			return info.steps;
 		}
 		
 		function getStepsGoal() {
-			return ActivityMonitor.getInfo().stepGoal;
+			var info = ActivityMonitor.getInfo();
+			if (!(info has :stepGoal)) {
+				return null;
+			}
+
+			return info.stepGoal;
 		}
 	}
 }
