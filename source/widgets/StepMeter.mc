@@ -52,7 +52,7 @@ module SimpleSensor {
 	    }
 	    
 	    function renderStepText(dc, steps, stepsGoal) {
-	    	 dc.setColor(Graphics.COLOR_DK_BLUE, Graphics.COLOR_BLACK);
+	    	 dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLACK);
 	    	 
 	    	 var str = Lang.format("$1$/$2$", [steps, stepsGoal]);
 	    	 dc.drawText(STEP_TEXT_X, STEP_TEXT_Y, Graphics.FONT_XTINY, str, Graphics.TEXT_JUSTIFY_RIGHT);
